@@ -1,11 +1,8 @@
 class User
   include Mongoid::Document
+  acts_as_token_authenticatable
 
-  field :name, type: String
-  field :key, type: String
-
-  validates :name, presence: true
-  validates :key, presence: true
+  field :authentication_token
 
   has_many :videos, dependent: :destroy
 end
