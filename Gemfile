@@ -16,6 +16,7 @@ gem 'puma', '~> 4.1'
 gem 'mongoid'
 gem 'bson_ext'
 gem 'simple_token_authentication'
+gem 'carrierwave-mongoid'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
