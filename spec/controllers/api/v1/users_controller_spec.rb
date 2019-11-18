@@ -8,23 +8,15 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
     context 'new user' do
       it 'should return new auth key if no params' do
         get '/api/v1/signin', headers: json
-        body = JSON.parse(response.body)
 
-        expect(response).to have_http_status(:created)
-        expect(body['authentication_token']).to eq User.last.authentication_token
-        expect(body['authentication_token']).to_not eq user.authentication_token
+        make_default_signin_tests(response, user)
       end
 
-      it 'should return new auth key wrong params' do
+      it 'should return new auth key if wrong params' do
         request = '/api/v1/signin?name=devid&key=00000'
         get request, headers: json
-        body = JSON.parse(response.body)
 
-        expect(response).to have_http_status(:created)
-        expect(body).to include('authentication_token', '_id')
-        expect(body['authentication_token']).to eq User.last.authentication_token
-        expect(body['authentication_token']).to_not eq user.authentication_token
-        expect(body['_id']['$oid']).to eq User.last._id.to_s
+        make_default_signin_tests(response, user)
       end
     end
 

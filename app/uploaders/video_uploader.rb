@@ -1,5 +1,4 @@
 class VideoUploader < CarrierWave::Uploader::Base
-  #include CarrierWave::Video
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
   # include CarrierWave::MiniMagick

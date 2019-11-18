@@ -2,10 +2,10 @@ class Api::V1::VideosController < ApplicationController
 
   def show
     if signed_user
-      video_list = @user.videos.inject([]) { |acc, video| acc << video.name }
+      video_list = @user.videos.pluck(:name)
       render json: @user.as_json(only: [:_id]).merge('video_list' => video_list), status: :accepted
     else
-      render json: User.create!.as_json(only: [:_id]).merge('video_list' => {}), status: :created
+      redirect_to controller: 'api/v1/users', action: 'signin'
     end
   end
 
@@ -17,6 +17,8 @@ class Api::V1::VideosController < ApplicationController
       else
         render json: video.as_json(only: :name), status: :ok
       end
+    else
+      redirect_to controller: 'api/v1/users', action: 'signin'
     end
   end
 

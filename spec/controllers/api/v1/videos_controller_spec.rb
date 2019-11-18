@@ -14,14 +14,11 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
 
   describe 'GET /show' do
     context 'new user' do
-      it 'should return new auth key' do
+      it 'should redirect to /signin and return new auth key' do
         get '/api/v1/videos'
-        body = JSON.parse(response.body)
+        follow_redirect!
 
-        expect(response).to have_http_status(:created)
-        expect(body).to include('video_list', '_id')
-        expect(body['_id']['$oid']).to eq User.last._id.to_s
-        expect(body['video_list']).to be_empty
+        make_default_signin_tests(response, user)
       end
     end
 
@@ -41,8 +38,22 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
 
   describe 'POST /upload' do
     context 'new user' do
-      it 'should redirect user to /show as a new user' do
+      it 'should redirect to /signin and return new auth key' do
+        params = { name: 'test_file', source: file }
+        post '/api/v1/upload', headers: form_data, params: params
+        follow_redirect!
 
+        make_default_signin_tests(response, user)
+      end
+    end
+
+    context 'user with wrong authentication token' do
+      it 'should redirect to /signin and return new auth key' do
+        params = { authentication_token: 'wrong token', name: 'test_file', source: file }
+        post '/api/v1/upload', headers: form_data, params: params
+        follow_redirect!
+
+        make_default_signin_tests(response, user)
       end
     end
 

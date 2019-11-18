@@ -6,6 +6,7 @@ require 'mongoid_cleaner'
 ENV['RAILS_ENV'] ||= 'test'
 
 require File.expand_path('../config/environment', __dir__)
+require File.expand_path('../spec/support/default_signin_specs', __dir__)
 
 Mongoid.load!(Rails.root.join("config", "mongoid.yml"))
 
@@ -38,6 +39,7 @@ end
 RSpec.configure do |config|
   config.include ActionDispatch::TestProcess::FixtureFile
   config.include Mongoid::Matchers, type: :model
+  config.include DefaultSigninSpecs, type: :request
 
   config.before(:suite) do
     MongoidCleaner.strategy = :drop
