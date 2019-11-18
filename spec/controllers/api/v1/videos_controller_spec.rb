@@ -24,26 +24,25 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
         body = JSON.parse(response.body)
 
         expect(response).to have_http_status(:accepted)
-        #expect(body).to eq 1
         expect(body).to include('video_list', '_id')
         expect(body['_id']['$oid']).to eq user._id.to_s
       end
     end
   end
 
-  #describe 'POST /upload' do
-  #  context 'new user' do
-  #    it 'should redirect user to /show as a new user' do
-  #
-  #    end
-  #  end
-  #
-  #  context 'authorized user' do
-  #    it 'should return :accepted status with file processing status' do
-  #      post '/api/v1/'
-  #    end
-  #  end
-  #end
+  describe 'POST /upload' do
+    context 'new user' do
+      it 'should redirect user to /show as a new user' do
+
+      end
+    end
+
+    context 'authorized user' do
+      it 'should return :accepted status with file processing status' do
+        #post '/api/v1/upload'
+      end
+    end
+  end
   #
   #describe 'POST /restart' do
   #  context 'new user' do
