@@ -3,13 +3,21 @@ require 'rails_helper'
 RSpec.describe 'Api::V1::VideosController', type: :request do
 
   json = { 'CONTENT_TYPE' => 'application/json' }
+  form_data = { 'CONTENT_TYPE' => 'multipart/form-data' }
+  video_path = 'spec/fixtures/files/video.mp4'
+  img_path = 'spec/fixtures/files/video.jpg'
+
+  let!(:user) { User.create }
+  let(:file) { fixture_file_upload(video_path) }
+  let(:img) { fixture_file_upload(img_path) }
+
 
   describe 'GET /show' do
-    let!(:user) { User.create }
     context 'new user' do
       it 'should return new auth key' do
         get '/api/v1/videos'
         body = JSON.parse(response.body)
+
         expect(response).to have_http_status(:created)
         expect(body).to include('video_list', '_id')
         expect(body['_id']['$oid']).to eq User.last._id.to_s
@@ -26,6 +34,7 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
         expect(response).to have_http_status(:accepted)
         expect(body).to include('video_list', '_id')
         expect(body['_id']['$oid']).to eq user._id.to_s
+
       end
     end
   end
@@ -38,8 +47,27 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
     end
 
     context 'authorized user' do
-      it 'should return :accepted status with file processing status' do
-        #post '/api/v1/upload'
+      context 'upload video' do
+        it 'should return :accepted status with file processing status' do
+          params = { authentication_token: user.authentication_token, name: 'test_file', source: file }
+          post '/api/v1/upload', headers: form_data, params: params
+          body = JSON.parse(response.body)
+
+          expect(response).to have_http_status(:ok)
+          expect(body).to include('name')
+          expect(body['name']).to eq params[:name]
+        end
+      end
+
+      context 'upload wrong file' do
+        it 'should return :not_acceptable status with error json' do
+          params = { authentication_token: user.authentication_token, name: 'test_file', source: img }
+          post '/api/v1/upload', headers: form_data, params: params
+          body = JSON.parse(response.body)
+
+          expect(response).to have_http_status(:not_acceptable)
+          expect(body).to include('error')
+        end
       end
     end
   end

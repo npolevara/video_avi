@@ -1,7 +1,11 @@
 class VideoUploader < CarrierWave::Uploader::Base
+  #include CarrierWave::Video
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
   # include CarrierWave::MiniMagick
+  def extension_whitelist
+    %w(mp4 wmv avi mpg)
+  end
 
   # Choose what kind of storage to use for this uploader:
   storage :file

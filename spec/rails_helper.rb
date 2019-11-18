@@ -36,6 +36,7 @@ Shoulda::Matchers.configure do |config|
 end
 
 RSpec.configure do |config|
+  config.include ActionDispatch::TestProcess::FixtureFile
   config.include Mongoid::Matchers, type: :model
 
   config.before(:suite) do
@@ -46,6 +47,10 @@ RSpec.configure do |config|
     MongoidCleaner.cleaning do
       example.run
     end
+  end
+
+  config.after(:suite) do
+    puts `rm -rf public/uploads/video/source/*`
   end
   # RSpec Rails can automatically mix in different behaviours to your tests
   # based on their file location, for example enabling you to call `get` and
