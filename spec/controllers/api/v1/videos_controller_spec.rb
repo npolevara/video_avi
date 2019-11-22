@@ -4,7 +4,7 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
 
   json = { 'CONTENT_TYPE' => 'application/json' }
   form_data = { 'CONTENT_TYPE' => 'multipart/form-data' }
-  video_path = 'spec/fixtures/files/video.mp4'
+  video_path = 'spec/fixtures/files/video.mp3'
   img_path = 'spec/fixtures/files/video.jpg'
 
   let!(:user) { User.create }
@@ -60,13 +60,32 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
     context 'authorized user' do
       context 'upload video' do
         it 'should return :accepted status with file processing status' do
-          params = { authentication_token: user.authentication_token, name: 'test_file', source: file }
-          post '/api/v1/upload', headers: form_data, params: params
-          body = JSON.parse(response.body)
+          params = { authentication_token: user.authentication_token,
+                     name: 'test_file',
+                     source: file,
+                     cut_from: 10,
+                     cut_length: 25
+          }
+          expect { post '/api/v1/upload', headers: form_data, params: params }
+              .to change { user.videos.count }.by(1)
+          expect(user.videos.count).to eq(1)
+          perform_enqueued_jobs
 
+          body = JSON.parse(response.body)
           expect(response).to have_http_status(:ok)
           expect(body).to include('name')
           expect(body['name']).to eq params[:name]
+          expect(user.videos.count).to eq(2)
+
+          original_video = user.videos.first
+          cropped_video = user.videos.last
+          expect(original_video.name).to_not match(/.+\_cropped$/)
+          expect(cropped_video.name).to match(/.+\_cropped$/)
+          expect(cropped_video.file_path).to match(/.+\_cropped.mp3$/)
+
+          original_file = File.open(original_video.file_path, 'r').size
+          cropped_file = File.open(cropped_video.file_path, 'r').size
+          expect(cropped_file).to be < original_file
         end
       end
 
@@ -82,7 +101,7 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
       end
     end
   end
-  #
+
   #describe 'POST /restart' do
   #  context 'new user' do
   #    it 'should redirect user to /show as a new user' do

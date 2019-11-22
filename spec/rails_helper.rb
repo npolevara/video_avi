@@ -40,6 +40,7 @@ RSpec.configure do |config|
   config.include ActionDispatch::TestProcess::FixtureFile
   config.include Mongoid::Matchers, type: :model
   config.include DefaultSigninSpecs, type: :request
+  config.include ActiveJob::TestHelper
 
   config.before(:suite) do
     MongoidCleaner.strategy = :drop
@@ -52,8 +53,19 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
-    puts `rm -rf public/uploads/video/source/*`
+    puts `rm -rf public/uploads/video/*`
   end
+  #
+  #config.around(:each, :delayed_job) do |example|
+  #  #old_value = Delayed::Worker.delay_jobs
+  #  Delayed::Worker.delay_jobs = true
+  #  #CropVideoJob.perform_later(@video._id.to_s)
+  #  #Delayed::Job.destroy_all
+  #
+  #  example.run
+  #
+  #  #Delayed::Worker.delay_jobs = old_value
+  #end
   # RSpec Rails can automatically mix in different behaviours to your tests
   # based on their file location, for example enabling you to call `get` and
   # `post` in specs under `spec/controllers`.
@@ -74,3 +86,25 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 end
+
+#class ActiveJob::QueueAdapters::DelayedJobAdapter
+#  class EnqueuedJobs
+#    def clear
+#      Delayed::Job.where(failed_at:nil).map &:destroy
+#    end
+#  end
+#
+#  class PerformedJobs
+#    def clear
+#      Delayed::Job.where.not(failed_at:nil).map &:destroy
+#    end
+#  end
+#
+#  def enqueued_jobs
+#    EnqueuedJobs.new
+#  end
+#
+#  def performed_jobs
+#    PerformedJobs.new
+#  end
+#end

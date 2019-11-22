@@ -2,7 +2,7 @@ class Api::V1::VideosController < ApplicationController
 
   def show
     if signed_user
-      video_list = @user.videos.pluck(:name)
+      video_list = @user.videos.pluck(:name, :length, :status, :file_path)
       render json: @user.as_json(only: [:_id]).merge('video_list' => video_list), status: :accepted
     else
       redirect_to controller: 'api/v1/users', action: 'signin'
