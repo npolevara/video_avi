@@ -17,7 +17,9 @@ gem 'mongoid'
 gem 'bson_ext'
 gem 'simple_token_authentication'
 gem 'carrierwave-mongoid'
-#gem 'carrierwave-video'
+
+gem 'delayed_job_mongoid'
+gem 'daemons'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false

@@ -11,11 +11,12 @@ class Api::V1::VideosController < ApplicationController
 
   def upload
     if signed_user
-      video = @user.videos.create(required_params.except(:authentication_token))
-      if video.new_record?
-        render json: { error: video.errors.full_messages.first }, status: :not_acceptable
+      @video = @user.videos.create(required_params.except(:authentication_token))
+      if @video.new_record?
+        render json: { error: @video.errors.full_messages.first }, status: :not_acceptable
       else
-        render json: video.as_json(only: :name), status: :ok
+        CropVideoJob.perform_later(@video._id.to_s)
+        render json: @video.as_json(only: :name), status: :ok
       end
     else
       redirect_to controller: 'api/v1/users', action: 'signin'

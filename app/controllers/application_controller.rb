@@ -7,7 +7,7 @@ class ApplicationController < ActionController::API
   private
 
   def required_params
-    token = params.permit(:authentication_token, :source, :name, :length, :cut_from, :cut_to)
+    token = params.permit(:authentication_token, :source, :name, :cut_from, :cut_length)
     return if token.to_h.empty?
     token
   end
