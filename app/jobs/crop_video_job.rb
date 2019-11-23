@@ -23,7 +23,7 @@ class CropVideoJob < ApplicationJob
   end
 
   rescue_from(StandardError) do |exception|
-    error = {'fails' => exception }.to_json
+    error = 'fails' + ': ' + exception.to_s
     current_video.status!(error)
   end
 

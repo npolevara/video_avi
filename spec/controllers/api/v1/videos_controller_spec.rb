@@ -10,6 +10,8 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
   let!(:user) { User.create }
   let(:file) { fixture_file_upload(video_path) }
   let(:img) { fixture_file_upload(img_path) }
+  let(:video) { Video.create!(name:'some_name', user_id: user._id, source: file, status: 'done', length: '10:00') }
+  let(:failed_video) { Video.create!(name:'fail_name', user_id: user._id, source: file, status: 'fails: errors') }
 
 
   describe 'GET /show' do
@@ -23,7 +25,8 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
     end
 
     context 'authorized user' do
-      it 'should return user show json' do
+      before { video }
+      it 'should return user videos list json' do
         request = "/api/v1/videos?_id=#{user.id}&authentication_token=#{user.authentication_token}"
         get request, headers: json
         body = JSON.parse(response.body)
@@ -31,10 +34,10 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
         expect(response).to have_http_status(:accepted)
         expect(body).to include('video_list', '_id')
         expect(body['_id']['$oid']).to eq user._id.to_s
-
+        expect(body['video_list'].first).to contain_exactly(video.name, video.status, video.length, video.file_path)
       end
     end
-  end
+   end
 
   describe 'POST /upload' do
     context 'new user' do
@@ -99,25 +102,34 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
           expect(body).to include('error')
         end
       end
-
-      context 'receive error in background work after uploading file' do
-        it 'should return'
-      end
     end
   end
 
-  #describe 'POST /restart' do
-  #  context 'new user' do
-  #    it 'should redirect user to /show as a new user' do
-  #
-  #    end
-  #  end
-  #
-  #  context 'authorized user' do
-  #    it 'should return :accepted status with file processing status' do
-  #
-  #    end
-  #  end
-  #end
+  describe 'POST /restart' do
+    context 'new user' do
+      it 'should redirect user to /show as a new user' do
+        params = { authentication_token: 'wrong token', name: 'test_file', cut_from: 10, cut_length: 25 }.to_json
+        post '/api/v1/restart', headers: json, params: params
+        follow_redirect!
 
+        make_default_signin_tests(response, user)
+      end
+    end
+
+    context 'authorized user' do
+      before { video }
+      it 'should return :accepted status with file processing status' do
+        params = { authentication_token: user.authentication_token, name: failed_video.name, cut_from: 10, cut_length: 25 }
+        post '/api/v1/restart', headers: form_data, params: params
+        perform_enqueued_jobs
+
+        body = JSON.parse(response.body)
+        expect(response).to have_http_status(:ok)
+        expect(body).to include('name', 'status')
+        expect(body['name']).to eq failed_video.name
+        expect(body['status']).to eq 'scheduled'
+        expect(video.status).to eq 'done'
+      end
+    end
+  end
 end

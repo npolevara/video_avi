@@ -19,8 +19,7 @@ RSpec.describe CropVideoJob, type: :job do
       CropVideoJob.perform_now(video._id.to_s)
 
       video.reload
-      expect(JSON.parse(video.status).has_key?('fails')).to eq true
-      expect(JSON.parse(video.status)['fails']).to match(error_txt)
+      expect(video.status).to match(/\Afails:.+went wrong\z/)
     end
   end
 end

@@ -6,16 +6,22 @@ class Api::V1::VideosController < ApplicationController
   end
 
   def upload
-      @video = @user.videos.create(required_params.except(:authentication_token))
-      if @video.new_record?
-        render json: { error: @video.errors.full_messages.first }, status: :not_acceptable
+      video = @user.videos.create(required_params.except(:authentication_token))
+      if video.new_record?
+        render json: { error: video.errors.full_messages.first }, status: :not_acceptable
       else
-        CropVideoJob.perform_later(@video._id.to_s)
-        render json: @video.as_json(only: :name), status: :ok
+        CropVideoJob.perform_later(video._id.to_s)
+        render json: video.as_json(only: :name), status: :ok
       end
   end
 
-  def refresh
-
+  def restart
+    video = @user.videos.where(name: required_params[:name], status: /\Afails:.+/ )[0]
+    if video
+      CropVideoJob.perform_later(video._id.to_s)
+      render json: video.reload.as_json(only: [:name, :status]), status: :ok
+    else
+      render json: 'file not found', status: :not_found
+    end
   end
 end
