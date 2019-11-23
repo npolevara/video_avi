@@ -5,7 +5,7 @@ class CropVideoJob < ApplicationJob
   end
 
   after_perform do
-    current_video.status!('done')
+    current_video.update(status: 'done')
     new_name = current_video.name + '_cropped'
     source = Pathname.new(current_video.cropped_name).open
     new_video = current_video.user.videos.create!(name: new_name, source: source)
@@ -18,13 +18,13 @@ class CropVideoJob < ApplicationJob
   end
 
   def perform(video_id)
-    current_video.status!('processing')
+    current_video.update(status: 'processing')
     current_video.crop
   end
 
   rescue_from(StandardError) do |exception|
     error = 'fails' + ': ' + exception.to_s
-    current_video.status!(error)
+    current_video.update(status: error)
   end
 
   private

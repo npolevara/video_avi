@@ -8,5 +8,6 @@ Rails.application.routes.draw do
       post 'restart', to: 'videos#restart'
     end
   end
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+
+  match '*path', :to => 'application#routing_error', via: [:get, :post]
 end

@@ -10,8 +10,22 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
   let!(:user) { User.create }
   let(:file) { fixture_file_upload(video_path) }
   let(:img) { fixture_file_upload(img_path) }
-  let(:video) { Video.create!(name:'some_name', user_id: user._id, source: file, status: 'done', length: '10:00') }
-  let(:failed_video) { Video.create!(name:'fail_name', user_id: user._id, source: file, status: 'fails: errors') }
+  let(:video) { Video.create!(name:'some_name',
+                              user_id: user._id,
+                              source: file,
+                              cut_from: 5,
+                              cut_length: 20,
+                              status: 'done',
+                              length: '10:00')
+  }
+
+  let(:failed_video) { Video.create!(name:'fail_name',
+                                     user_id: user._id,
+                                     source: file,
+                                     cut_from: 5,
+                                     cut_length: 20,
+                                     status: 'fails: errors')
+  }
 
 
   describe 'GET /show' do

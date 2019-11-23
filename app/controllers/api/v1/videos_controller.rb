@@ -21,7 +21,7 @@ class Api::V1::VideosController < ApplicationController
       CropVideoJob.perform_later(video._id.to_s)
       render json: video.reload.as_json(only: [:name, :status]), status: :ok
     else
-      render json: 'file not found', status: :not_found
+      render :nothing => true, status: :not_found
     end
   end
 end
