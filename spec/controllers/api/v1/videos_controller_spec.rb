@@ -99,6 +99,10 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
           expect(body).to include('error')
         end
       end
+
+      context 'receive error in background work after uploading file' do
+        it 'should return'
+      end
     end
   end
 

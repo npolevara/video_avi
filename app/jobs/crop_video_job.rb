@@ -18,8 +18,13 @@ class CropVideoJob < ApplicationJob
   end
 
   def perform(video_id)
-    current_video.status!('done')
+    current_video.status!('processing')
     current_video.crop
+  end
+
+  rescue_from(StandardError) do |exception|
+    error = {'fails' => exception }.to_json
+    current_video.status!(error)
   end
 
   private
