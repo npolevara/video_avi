@@ -53,8 +53,8 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
         body = JSON.parse(response.body)
 
         expect(response).to have_http_status(:accepted)
-        expect(body).to include('video_list', '_id')
-        expect(body['_id']['$oid']).to eq user._id.to_s
+        expect(body).to include('video_list', 'id')
+        expect(body['id']).to eq user._id.to_str
         expect(body['video_list'].first).to contain_exactly(video.name, video.status, video.length, video.file_path)
       end
     end

@@ -27,9 +27,9 @@ RSpec.describe 'Api::V1::UsersController', type: :request do
         body = JSON.parse(response.body)
 
         expect(response).to have_http_status(:accepted)
-        expect(body).to include('authentication_token', '_id')
+        expect(body).to include('authentication_token', 'id')
         expect(body['authentication_token']).to eq user.authentication_token
-        expect(body['_id']['$oid']).to eq user._id.to_s
+        expect(body['id']).to eq user._id.to_s
       end
     end
   end

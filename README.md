@@ -55,55 +55,49 @@ localhost:3000/api/v1/signin
 ```
 ``
 {
-    "_id": {
-        "$oid": USER_ID
-    },
+    "id": USER_ID,
     "authentication_token": TOKEN
 }
 ``
 ###### if send localhost:3000/api/v1/signin?authentication_token=TOKEN
 ###### server returns user TOKEN only
 
-### Get User video list
+### GET User video list
 ```
 localhost:3000/api/v1/videos?authentication_token=TOKEN
 ```
 ````
 {
-    "_id": {
-        "$oid": "5dd1f17fa74ad82596324636"
-    },
+    "id": USER_ID,
     "video_list": []
 }
 ````
 ###### new user has no videos
 
-### Post new video
+### POST new video
 ```
-http://127.0.0.1:3000/api/v1/upload?authentication_token=TOKEN
+localhost:3000/api/v1/upload?authentication_token=TOKEN
 ```
 ###### body = form-data
-######authentication_token = TOKEN
-######name = 'video name'
-######source = file 'local file path'
-######cut_from = 10 'start cut position in seconds'
-######cut_length = 200 'length cut position in seconds'
+###### authentication_token = TOKEN
+###### name = 'video name'
+###### source = file 'local file path'
+###### cut_from = 10 'start cut position in seconds'
+###### cut_length = 200 'length cut position in seconds'
 
 ````
 {
     "name": "video_name"
 }
 ````
-### Get User video list after upload
+### GET User video list after upload
 ```
 localhost:3000/api/v1/videos?authentication_token=TOKEN
 ```
 ###### return list of uploader and croppd file
 ````
 {
-    "_id": {
-        "$oid": "5dd1f17fa74ad82596324636"
-    },
+    "id": USER_ID,
     "video_list": [
         [
             "video_name",
@@ -114,12 +108,10 @@ localhost:3000/api/v1/videos?authentication_token=TOKEN
     ]
 }
 ````
-####### after ffmpeg finish task
+###### after ffmpeg finish task in background
 ````
 {
-    "_id": {
-        "$oid": "5dd1f17fa74ad82596324636"
-    },
+    "id": USER_ID,
     "video_list": [
         [
             "video_name",
@@ -136,7 +128,12 @@ localhost:3000/api/v1/videos?authentication_token=TOKEN
     ]
 }
 ````
-### Restart failed video
+### POST Restart failed video
+###### restart video with status failed
 `````
-http://127.0.0.1:3000/api/v1/restart?authentication_token=TOKEN&name=video_name&cut_from=10&cut_length=25
+localhost:3000/api/v1/restart?authentication_token=TOKEN&name=video_name&cut_from=10&cut_length=25
 `````
+###### authentication_token = TOKEN
+###### name = 'video_name'
+###### cut_from = 10 'start cut position in seconds'
+###### cut_length = 200 'length cut position in seconds'

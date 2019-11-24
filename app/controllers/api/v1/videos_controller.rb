@@ -3,7 +3,7 @@ module Api
     class VideosController < ApplicationController
       def show
         video_list = @user.videos.pluck(:name, :length, :status, :file_path)
-        render json: @user.as_json(only: [:_id]).merge('video_list' => video_list), status: :accepted
+        render json: @user.user_json.merge('video_list' => video_list), status: :accepted
       end
 
       def upload
