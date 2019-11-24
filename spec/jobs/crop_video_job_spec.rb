@@ -6,7 +6,7 @@ RSpec.describe CropVideoJob, type: :job do
 
   let!(:user) { User.create }
   let!(:file) { fixture_file_upload(video_path) }
-  let!(:video) { Video.create!(name:'some name', user_id: user._id, source: file, status: 'enqueued') }
+  let!(:video) { Video.create!(name: 'some name', user_id: user._id, source: file, status: 'enqueued') }
 
   describe '#perform_later with error' do
     it 'reports errors' do

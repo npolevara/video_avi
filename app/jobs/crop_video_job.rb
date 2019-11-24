@@ -17,7 +17,7 @@ class CropVideoJob < ApplicationJob
     current_video.update_file_and_status!('scheduled')
   end
 
-  def perform(video_id)
+  def perform(*args)
     current_video.update(status: 'processing')
     current_video.crop
   end
@@ -30,6 +30,6 @@ class CropVideoJob < ApplicationJob
   private
 
   def current_video
-    @video ||= Video.find_by!(_id: self.arguments.first)
+    @video ||= Video.find_by!(_id: arguments.first)
   end
 end

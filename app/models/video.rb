@@ -18,24 +18,26 @@ class Video
   belongs_to :user
 
   def crop
-    puts `ffmpeg -i #{get_file_path} -ss #{cut_from} -t #{cut_length} #{cropped_name}`
+    puts `ffmpeg -i #{show_file_path} -ss #{cut_from} -t #{cut_length} #{cropped_name}`
   end
 
   def set_length
-    time = capture(:stdout) { puts `ffmpeg -i #{get_file_path} 2>&1 | grep Duration | awk '{print $2}' | tr -d ,` }
+    time = capture(:stdout) { puts `ffmpeg -i #{show_file_path} 2>&1 | grep Duration | awk '{print $2}' | tr -d ,` }
        .strip
     check_lenght(time) unless cropped?
     self.length = time
   end
 
   def set_file_path
-    self.file_path = get_file_path
+
+    link = "#{ENV['ROOT_URL']}/api/v1/download?authentication_token=#{user.authentication_token}"
+    link += "&name=#{name}&id=#{_id.to_str}"
+    self.file_path = link
   end
 
   def cropped_name
-    get_file_path.gsub(/(\..{3}$)/,'_cropped\1')
+    show_file_path.gsub(/(\..{3}$)/, '_cropped\1')
   end
-
 
   def cropped?
     name =~ /\_cropped\z/
@@ -47,17 +49,18 @@ class Video
     update(status: status)
   end
 
+  def show_file_path
+    source.file.file
+  end
+
   private
 
   def check_lenght(time)
     no_marks = cut_from.nil? || cut_length.nil? || (cut_from.nil? && cut_length.nil?)
-    raise StandardError.new('No crop marks given') if no_marks
+    raise StandardError, 'No crop marks given' if no_marks
+
     full_crop = cut_from + cut_length
     file_time = Time.parse(time).seconds_since_midnight
-    raise StandardError.new("Crop marks to long, crop length:#{full_crop}, video length#{file_time}") if full_crop > file_time
-  end
-
-  def get_file_path
-    source.file.file
+    raise StandardError, "Crop marks to long, crop length:#{full_crop}, video length#{file_time}" if full_crop > file_time
   end
 end

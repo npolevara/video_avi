@@ -7,26 +7,33 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
   video_path = 'spec/fixtures/files/video.mp3'
   img_path = 'spec/fixtures/files/video.jpg'
 
+  def download_link(video_file)
+    link = "#{ENV['ROOT_URL']}/api/v1/download?authentication_token=#{video_file.user.authentication_token}"
+    link += "&name=#{video_file.name}&id=#{video_file._id.to_str}"
+    link
+  end
+
   let!(:user) { User.create }
   let(:file) { fixture_file_upload(video_path) }
   let(:img) { fixture_file_upload(img_path) }
-  let(:video) { Video.create!(name:'some_name',
-                              user_id: user._id,
-                              source: file,
-                              cut_from: 5,
-                              cut_length: 20,
-                              status: 'done',
-                              length: '10:00')
-  }
+  let(:video) do
+    Video.create!(name: 'some_name',
+                  user_id: user._id,
+                  source: file,
+                  cut_from: 5,
+                  cut_length: 20,
+                  status: 'done',
+                  length: '10:00')
+  end
 
-  let(:failed_video) { Video.create!(name:'fail_name',
-                                     user_id: user._id,
-                                     source: file,
-                                     cut_from: 5,
-                                     cut_length: 20,
-                                     status: 'fails: errors')
-  }
-
+  let(:failed_video) do
+    Video.create!(name: 'fail_name',
+                  user_id: user._id,
+                  source: file,
+                  cut_from: 5,
+                  cut_length: 20,
+                  status: 'fails: errors')
+  end
 
   describe 'GET /show' do
     context 'new user' do
@@ -51,7 +58,7 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
         expect(body['video_list'].first).to contain_exactly(video.name, video.status, video.length, video.file_path)
       end
     end
-   end
+  end
 
   describe 'POST /upload' do
     context 'new user' do
@@ -98,10 +105,12 @@ RSpec.describe 'Api::V1::VideosController', type: :request do
           cropped_video = user.videos.last
           expect(original_video.name).to_not match(/.+\_cropped$/)
           expect(cropped_video.name).to match(/.+\_cropped$/)
-          expect(cropped_video.file_path).to match(/.+\_cropped.mp3$/)
 
-          original_file = File.open(original_video.file_path, 'r').size
-          cropped_file = File.open(cropped_video.file_path, 'r').size
+          expect(original_video.file_path).to eq download_link(original_video)
+          expect(cropped_video.file_path).to eq download_link(cropped_video)
+
+          original_file = File.open(original_video.source.file.file, 'r').size
+          cropped_file = File.open(cropped_video.source.file.file, 'r').size
           expect(cropped_file).to be < original_file
         end
       end

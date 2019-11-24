@@ -3,7 +3,7 @@ class VideoUploader < CarrierWave::Uploader::Base
   # include CarrierWave::RMagick
   # include CarrierWave::MiniMagick
   def extension_whitelist
-    %w(mp4 mp3 wmv avi mpg)
+    %w[mp4 mp3 wmv avi mpg]
   end
 
   # Choose what kind of storage to use for this uploader:

@@ -55,30 +55,7 @@ RSpec.configure do |config|
   config.after(:suite) do
     puts `rm -rf public/uploads/video/*`
   end
-  #
-  #config.around(:each, :delayed_job) do |example|
-  #  #old_value = Delayed::Worker.delay_jobs
-  #  Delayed::Worker.delay_jobs = true
-  #  #CropVideoJob.perform_later(@video._id.to_s)
-  #  #Delayed::Job.destroy_all
-  #
-  #  example.run
-  #
-  #  #Delayed::Worker.delay_jobs = old_value
-  #end
-  # RSpec Rails can automatically mix in different behaviours to your tests
-  # based on their file location, for example enabling you to call `get` and
-  # `post` in specs under `spec/controllers`.
-  #
-  # You can disable this behaviour by removing the line below, and instead
-  # explicitly tag your specs with their type, e.g.:
-  #
-  #     RSpec.describe UsersController, :type => :controller do
-  #       # ...
-  #     end
-  #
-  # The different available types are documented in the features, such as in
-  # https://relishapp.com/rspec/rspec-rails/docs
+
   config.infer_spec_type_from_file_location!
 
   # Filter lines from Rails gems in backtraces.
@@ -86,25 +63,3 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 end
-
-#class ActiveJob::QueueAdapters::DelayedJobAdapter
-#  class EnqueuedJobs
-#    def clear
-#      Delayed::Job.where(failed_at:nil).map &:destroy
-#    end
-#  end
-#
-#  class PerformedJobs
-#    def clear
-#      Delayed::Job.where.not(failed_at:nil).map &:destroy
-#    end
-#  end
-#
-#  def enqueued_jobs
-#    EnqueuedJobs.new
-#  end
-#
-#  def performed_jobs
-#    PerformedJobs.new
-#  end
-#end
